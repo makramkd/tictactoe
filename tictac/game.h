@@ -24,7 +24,7 @@ namespace tictac {
             
         }
         
-        void play() {
+        int play() {
             using std::cout;
             using std::cin;
             
@@ -33,6 +33,9 @@ namespace tictac {
             cout << "As well as the coordinates of the move separated by spaces\n";
             cout << "Example: 'x 0 1' plays x on the top middle of the board\n";
             
+            char letter;
+            int x, y;
+            board_state state;
             while (1) {
                 cout << ">>> ";
                 cin >> letter >> x >> y;
@@ -42,13 +45,13 @@ namespace tictac {
                     cout << "Invalid move\n";
                 } else {
                     board.play_move(current_move);
-                    state = board.check_board(board);
+                    state = board.check_board();
                     switch(state) {
                         case board_state::x_win:
                             cout << "Player x has won!\n";
                             return 0;
                         case board_state::y_win:
-                            cout << "Player y has won!\n";
+                            cout << "Player o has won!\n";
                             return 0;
                         case board_state::draw:
                             cout << "It was a draw! Good play!\n";
@@ -61,7 +64,7 @@ namespace tictac {
         }
     private:
         board_t board;
-    }
+    };
 }
 
 #endif /* game_h */

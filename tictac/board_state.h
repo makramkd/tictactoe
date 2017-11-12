@@ -15,12 +15,12 @@
 // utility macros to ease copy pasta
 #ifndef MAKE_HORIZONTAL_STATE
 #define MAKE_HORIZONTAL_STATE(row,col) \
-    make_tuple(make_pair((row), (col)), make_pair((row), (col+1)), make_pair((row), (col+2)))
+    std::make_tuple(std::make_pair((row), (col)), std::make_pair((row), (col+1)), std::make_pair((row), (col+2)))
 #endif
 
 #ifndef MAKE_VERTICAL_STATE
 #define MAKE_VERTICAL_STATE(row,col) \
-    make_tuple(make_pair((row), (col)), make_pair((row+1), (col)), make_pair((row+2), (col)))
+    std::make_tuple(std::make_pair((row), (col)), std::make_pair((row+1), (col)), std::make_pair((row+2), (col)))
 #endif
 
 namespace tictac {

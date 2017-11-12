@@ -9,10 +9,12 @@
 #ifndef board_h
 #define board_h
 
+#include <iostream>
 #include <vector>
 #include <array>
 #include <utility>
 #include <tuple>
+#include <algorithm>
 
 #include "move.h"
 #include "board_state.h"
@@ -33,11 +35,54 @@ namespace tictac {
          * the state of the board.
         */
         void play_move(move_t move) {
-            // stub
+            using std::cout;
+            
+            auto letter = std::get<0>(move);
+            auto x = std::get<1>(move), y = std::get<2>(move);
+            // modify the current board with the given move
+            board[x][y] = letter;
+            // draw the board
+            for (auto i = board.begin(); i != board.end(); ++i) {
+                for (auto j = i->begin(); j != i->end(); j++) {
+                    // draw letter padded by a single space on each side
+                    // separated by a | character
+                    cout << ' ' << *j << ' ' << '|';
+                }
+                cout << '\n';
+            }
         }
         
         board_state check_board() const {
-            return board_state::unknown; //stub
+            // loop through all possible winning states to check if any one
+            // of them are satisfied
+            // The winning states consist of horizontal, vertical, and diagonal
+            // 3-in-a-rows, where all the elements are x's or o's exclusively
+            board_state state = board_state::unknown;
+            state = check_winning_states();
+            
+            // if board state is still unknown it means no one has won:
+            // it's either a draw or the game is still in progress
+            auto game_in_progress = in_progress();
+            if (state == board_state::unknown && game_in_progress) {
+                state = board_state::in_progress;
+            } else if (state == board_state::unknown && !game_in_progress) {
+                state = board_state::draw;
+            }
+            
+            return state;
+        }
+        
+        /*
+         * Return true if and only if the given move is valid.
+         */
+        bool valid_move(move_t move) {
+            auto letter = std::get<0>(move);
+            auto x = std::get<1>(move), y = std::get<2>(move);
+            bool valid = true;
+            valid = valid && (letter == 'x' || letter == 'o');
+            valid = valid && ((x >= 0 && x < 3) && (y >= 0 && y < 3));
+            valid = valid && (board[x][y] == ' ');
+            return valid;
         }
     private:
         std::vector<std::vector<char>> board;
@@ -45,7 +90,8 @@ namespace tictac {
         // This array maintains the possible winning states, irrespective of letter
         // used (i.e x or o). If we account for the letter there are simply double the
         // number of winning states shown below.
-        constexpr std::array<winning_state_t, NUM_WINNING_STATES> winning_states = {
+        static constexpr auto NUM_WINNING_STATES = 8;
+        static constexpr std::array<winning_state_t, NUM_WINNING_STATES> winning_states = {
             // winning horizontally (i.e all x's/o's in the 1st, 2nd, or 3rd rows)
             MAKE_HORIZONTAL_STATE(0, 0),
             MAKE_HORIZONTAL_STATE(1, 0),
@@ -60,13 +106,10 @@ namespace tictac {
             std::make_tuple(std::make_pair(0, 0), std::make_pair(1, 1), std::make_pair(2, 2)),
             std::make_tuple(std::make_pair(0, 2), std::make_pair(1, 1), std::make_pair(2, 0))
         };
-        
-        /*
-         * Return true if and only if the given move is valid.
-        */
-        bool valid_move(move_t move) {
-            return false; // stub
-        }
+        static constexpr std::array<char, 2> valid_letters = {
+            'x',
+            'o'
+        };
         
         /*
          * Check the winning states to see if they are satisfied
@@ -74,7 +117,23 @@ namespace tictac {
          * 'unknown' board_state.
         */
         board_state check_winning_states() const {
-            return board_state::unknown; // stub
+            board_state state;
+            for (auto i = winning_states.begin(); i != winning_states.end(); ++i)
+            {
+                for (auto j = valid_letters.begin(); j != valid_letters.end(); ++j)
+                {
+                    // check that the state has the given letter
+                    auto g0 = std::get<0>(*i), g1 = std::get<1>(*i), g2 = std::get<2>(*i);
+                    if (board[g0.first][g0.second] == *j &&
+                        board[g1.first][g1.second] == *j &&
+                        board[g2.first][g2.second] == *j)
+                    {
+                        state = *j == 'x' ? x_win : y_win;
+                        return state;
+                    }
+                }
+            }
+            return unknown;
         }
         
         /*
@@ -83,9 +142,15 @@ namespace tictac {
          * only works if no winning state is satisfied.
         */
         bool in_progress() const {
-            return false; // stub
+            std::vector<bool> unplayed_present;
+            std::for_each(board.begin(), board.end(), [&](const std::vector<char>& v){
+                unplayed_present.push_back(std::any_of(v.begin(), v.end(), [](const char& c){
+                    return c == ' ';
+                }));
+            });
+            return std::find(unplayed_present.begin(), unplayed_present.end(), true) != unplayed_present.end();
         }
-    }
+    };
 }
 
 #endif /* board_h */
