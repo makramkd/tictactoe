@@ -15,11 +15,13 @@
 #include "board.h"
 #include "board_state.h"
 #include "move.h"
+#include "random_engine.h"
 
 namespace tictac {
     struct game_t {
-        game_t()
-        : board()
+        game_t(char letter)
+        : board(),
+        re(letter)
         {
             
         }
@@ -55,15 +57,34 @@ namespace tictac {
                             return 0;
                         case board_state::draw:
                             cout << "It was a draw! Good play!\n";
-                            break;
+                            return 0;
                         default:
-                            continue;
+                            // it's the computer's turn
+                            break;
+                    }
+                    auto next_move = re.next_move(board);
+                    board.play_move(next_move);
+                    state = board.check_board();
+                    switch(state) {
+                        case board_state::x_win:
+                            cout << "Player x has won!\n";
+                            return 0;
+                        case board_state::y_win:
+                            cout << "Player o has won!\n";
+                            return 0;
+                        case board_state::draw:
+                            cout << "It was a draw! Good play!\n";
+                            return 0;
+                        default:
+                            // it's the computer's turn
+                            break;
                     }
                 }
             }
         }
     private:
         board_t board;
+        random_engine re;
     };
 }
 

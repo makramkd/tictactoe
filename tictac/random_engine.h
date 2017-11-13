@@ -32,7 +32,6 @@ namespace tictac {
             std::shuffle(valid_moves.begin(), valid_moves.end(), g);
             return *valid_moves.begin();
         }
-    private:
     };
 }
 
