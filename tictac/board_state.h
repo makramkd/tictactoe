@@ -31,7 +31,7 @@ namespace tictac {
     */
     enum board_state {
         x_win,
-        y_win,
+        o_win,
         in_progress,
         draw,
         unknown

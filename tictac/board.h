@@ -117,7 +117,7 @@ namespace tictac {
 
         bool terminal_state() const {
             auto state = check_board();
-            return state == board_state::x_win || state == board_state::y_win
+            return state == board_state::x_win || state == board_state::o_win
                 || state == board_state::draw;
         }
 
@@ -178,7 +178,7 @@ namespace tictac {
                         board[g1.first][g1.second] == *j &&
                         board[g2.first][g2.second] == *j)
                     {
-                        state = *j == 'x' ? x_win : y_win;
+                        state = *j == 'x' ? x_win : o_win;
                         return state;
                     }
                 }

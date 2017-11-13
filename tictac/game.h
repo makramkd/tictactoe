@@ -65,7 +65,7 @@ namespace tictac {
                     case board_state::x_win:
                         cout << "Player x has won!\n";
                         return 0;
-                    case board_state::y_win:
+                    case board_state::o_win:
                         cout << "Player o has won!\n";
                         return 0;
                     case board_state::draw:
@@ -82,7 +82,7 @@ namespace tictac {
                     case board_state::x_win:
                         cout << "Player x has won!\n";
                         return 0;
-                    case board_state::y_win:
+                    case board_state::o_win:
                         cout << "Player o has won!\n";
                         return 0;
                     case board_state::draw:
