@@ -84,6 +84,21 @@ namespace tictac {
             valid = valid && (board[x][y] == ' ');
             return valid;
         }
+        
+        /*
+         * Return a vector of valid moves that can be performed.
+        */
+        std::vector<move_t> valid_moves(char letter) const {
+            std::vector<move_t> moves;
+            for (auto i = 0; i < board.size(); ++i) {
+                for (auto j = 0; j < board[i].size(); ++j) {
+                    if (board[i][j] == ' ') {
+                        moves.push_back(std::make_tuple(letter, i, j));
+                    }
+                }
+            }
+            return moves;
+        }
     private:
         std::vector<std::vector<char>> board;
         
