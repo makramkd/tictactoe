@@ -55,6 +55,23 @@ namespace tictac {
             board[x][y] = letter;
             // draw the board
             draw_board();
+            // update the last_player
+            update_last_player();
+            return move_status::valid;
+        }
+
+        move_status play_move_no_stdout(move_t move) {
+            if (!valid_move(move)) {
+                return move_status::invalid;
+            }
+
+            using std::get;
+            auto letter = get<0>(move);
+            auto x = get<1>(move), y = get<2>(move);
+            // modify the current board with the given move
+            board[x][y] = letter;
+            // update the last_player
+            update_last_player();
             return move_status::valid;
         }
 
@@ -115,6 +132,15 @@ namespace tictac {
             }
         }
 
+        char current_letter() const {
+            switch(last_player) {
+                case player::x:
+                    return 'x';
+                default:
+                    return 'o';
+            }
+        }
+
         bool terminal_state() const {
             auto state = check_board();
             return state == board_state::x_win || state == board_state::o_win
@@ -127,7 +153,7 @@ namespace tictac {
         */
         board_t result(move_t move) const {
             board_t new_board(*this);
-            new_board.play_move(move);
+            new_board.play_move_no_stdout(move);
             return new_board;
         }
     private:
@@ -212,6 +238,15 @@ namespace tictac {
                     std::cout << ' ' << *j << ' ' << '|';
                 }
                 std::cout << '\n';
+            }
+        }
+
+        void update_last_player() {
+            switch(last_player) {
+                case player::x:
+                    last_player = player::o;
+                default:
+                    last_player = player::x;
             }
         }
     };
