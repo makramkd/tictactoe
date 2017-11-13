@@ -12,6 +12,7 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include <iostream>
 
 #include "engine.h"
 
@@ -77,15 +78,13 @@ namespace tictac {
 
         utility_t utility(const board_t& board) const {
             auto state = board.check_board();
-            switch (state) {
-                case board_state::x_win:
-                    return 1;
-                case board_state::o_win:
-                    return -1;
-                case board_state::draw:
-                    return 0;
-                default:
-                    return -1;
+            auto letter = board.current_letter();
+            if (state == draw) {
+                return 0;
+            } else if ((state == x_win && letter == 'o') || (state == o_win && letter == 'x')) {
+                return -1;
+            } else {
+                return 1;
             }
         }
     };

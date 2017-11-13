@@ -28,7 +28,8 @@ namespace tictac {
          * of a tic tac toe game.
         */
         explicit board_t()
-        : board(3, std::vector<char>(3, ' '))
+        : board(3, std::vector<char>(3, ' ')),
+        last_player(player::o)
         {
         }
 
@@ -135,9 +136,9 @@ namespace tictac {
         char current_letter() const {
             switch(last_player) {
                 case player::x:
-                    return 'x';
-                default:
                     return 'o';
+                default:
+                    return 'x';
             }
         }
 
@@ -245,6 +246,7 @@ namespace tictac {
             switch(last_player) {
                 case player::x:
                     last_player = player::o;
+                    break;
                 default:
                     last_player = player::x;
             }
