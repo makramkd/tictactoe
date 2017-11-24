@@ -25,7 +25,7 @@ namespace tictac {
     struct random_engine : public engine_t {
         explicit random_engine(char letter): engine_t(letter) {}
         
-        virtual move_t next_move(const board_t& board) {
+        move_t next_move(const board_t& board) {
             auto valid_moves = board.valid_moves(letter);
             std::random_device rd;
             std::mt19937 g(rd());

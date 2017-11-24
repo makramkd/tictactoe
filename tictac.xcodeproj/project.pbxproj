@@ -31,6 +31,8 @@
 		8489FEB41FB8A4C8007F22EC /* board_state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = board_state.h; sourceTree = "<group>"; };
 		8489FEB51FB924B6007F22EC /* engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = engine.h; sourceTree = "<group>"; };
 		8489FEB61FB9262E007F22EC /* random_engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = random_engine.h; sourceTree = "<group>"; };
+		8489FEB71FB9F91C007F22EC /* player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = player.h; sourceTree = "<group>"; };
+		8489FEB81FB9FCA7007F22EC /* minimax_engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = minimax_engine.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,8 @@
 				8489FEB41FB8A4C8007F22EC /* board_state.h */,
 				8489FEB51FB924B6007F22EC /* engine.h */,
 				8489FEB61FB9262E007F22EC /* random_engine.h */,
+				8489FEB71FB9F91C007F22EC /* player.h */,
+				8489FEB81FB9FCA7007F22EC /* minimax_engine.h */,
 			);
 			path = tictac;
 			sourceTree = "<group>";

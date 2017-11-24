@@ -15,9 +15,11 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
+#include <string>
 
 #include "move.h"
 #include "board_state.h"
+#include "player.h"
 
 namespace tictac {
     struct board_t {
@@ -26,32 +28,54 @@ namespace tictac {
          * of a tic tac toe game.
         */
         explicit board_t()
-        : board(3, std::vector<char>(3, ' '))
+        : board(3, std::vector<char>(3, ' ')),
+        last_player(player::o)
         {
         }
-        
+
+        board_t(const board_t& other_board)
+        : board(other_board.board),
+        last_player(other_board.last_player)
+        {
+        }
+
         /*
          * Play the given move on this board. This mutates
          * the state of the board.
         */
-        void play_move(move_t move) {
-            using std::cout;
-            
-            auto letter = std::get<0>(move);
-            auto x = std::get<1>(move), y = std::get<2>(move);
+        move_status play_move(move_t move) {
+            if (!valid_move(move)) {
+                draw_board();
+                return move_status::invalid;
+            }
+
+            using std::get;
+            auto letter = get<0>(move);
+            auto x = get<1>(move), y = get<2>(move);
             // modify the current board with the given move
             board[x][y] = letter;
             // draw the board
-            for (auto i = board.begin(); i != board.end(); ++i) {
-                for (auto j = i->begin(); j != i->end(); j++) {
-                    // draw letter padded by a single space on each side
-                    // separated by a | character
-                    cout << ' ' << *j << ' ' << '|';
-                }
-                cout << '\n';
-            }
+            draw_board();
+            // update the last_player
+            update_last_player();
+            return move_status::valid;
         }
-        
+
+        move_status play_move_no_stdout(move_t move) {
+            if (!valid_move(move)) {
+                return move_status::invalid;
+            }
+
+            using std::get;
+            auto letter = get<0>(move);
+            auto x = get<1>(move), y = get<2>(move);
+            // modify the current board with the given move
+            board[x][y] = letter;
+            // update the last_player
+            update_last_player();
+            return move_status::valid;
+        }
+
         board_state check_board() const {
             // loop through all possible winning states to check if any one
             // of them are satisfied
@@ -59,7 +83,7 @@ namespace tictac {
             // 3-in-a-rows, where all the elements are x's or o's exclusively
             board_state state = board_state::unknown;
             state = check_winning_states();
-            
+
             // if board state is still unknown it means no one has won:
             // it's either a draw or the game is still in progress
             auto game_in_progress = in_progress();
@@ -68,10 +92,10 @@ namespace tictac {
             } else if (state == board_state::unknown && !game_in_progress) {
                 state = board_state::draw;
             }
-            
+
             return state;
         }
-        
+
         /*
          * Return true if and only if the given move is valid.
          */
@@ -84,7 +108,7 @@ namespace tictac {
             valid = valid && (board[x][y] == ' ');
             return valid;
         }
-        
+
         /*
          * Return a vector of valid moves that can be performed.
         */
@@ -99,9 +123,47 @@ namespace tictac {
             }
             return moves;
         }
+
+        player current_player() const {
+            switch (last_player) {
+                case player::x:
+                    return player::o;
+                default:
+                    return player::x;
+            }
+        }
+
+        char current_letter() const {
+            switch(last_player) {
+                case player::x:
+                    return 'o';
+                default:
+                    return 'x';
+            }
+        }
+
+        bool terminal_state() const {
+            auto state = check_board();
+            return state == board_state::x_win || state == board_state::o_win
+                || state == board_state::draw;
+        }
+
+        /*
+         * Returns a board that would be the state of the game if the given move
+         * is played. This does not mutate the board.
+        */
+        board_t result(move_t move) const {
+            board_t new_board(*this);
+            new_board.play_move_no_stdout(move);
+            return new_board;
+        }
     private:
         std::vector<std::vector<char>> board;
-        
+
+        // this is in order to return the player whose turn it is
+        // to play on this board in its current state
+        player last_player;
+
         // This array maintains the possible winning states, irrespective of letter
         // used (i.e x or o). If we account for the letter there are simply double the
         // number of winning states shown below.
@@ -111,12 +173,12 @@ namespace tictac {
             MAKE_HORIZONTAL_STATE(0, 0),
             MAKE_HORIZONTAL_STATE(1, 0),
             MAKE_HORIZONTAL_STATE(2, 0),
-            
+
             // winning vertically (i.e all x's/o's in the 1st, 2nd, or 3rd columns)
             MAKE_VERTICAL_STATE(0, 0),
             MAKE_VERTICAL_STATE(0, 1),
             MAKE_VERTICAL_STATE(0, 2),
-            
+
             // winning diagonally (i.e all x's/o's along the main and reverse main diagonal)
             std::make_tuple(std::make_pair(0, 0), std::make_pair(1, 1), std::make_pair(2, 2)),
             std::make_tuple(std::make_pair(0, 2), std::make_pair(1, 1), std::make_pair(2, 0))
@@ -125,7 +187,7 @@ namespace tictac {
             'x',
             'o'
         };
-        
+
         /*
          * Check the winning states to see if they are satisfied
          * by either 'x' or 'o'. If they are not, we return the
@@ -143,14 +205,14 @@ namespace tictac {
                         board[g1.first][g1.second] == *j &&
                         board[g2.first][g2.second] == *j)
                     {
-                        state = *j == 'x' ? x_win : y_win;
+                        state = *j == 'x' ? x_win : o_win;
                         return state;
                     }
                 }
             }
             return unknown;
         }
-        
+
         /*
          * Checks whether the game played on this board is in progress.
          * This is indicated by any unplayed moves on the board. This
@@ -164,6 +226,30 @@ namespace tictac {
                 }));
             });
             return std::find(unplayed_present.begin(), unplayed_present.end(), true) != unplayed_present.end();
+        }
+
+        /*
+         * Draw the board onto stdout.
+        */
+        void draw_board() const {
+            for (auto i = board.begin(); i != board.end(); ++i) {
+                for (auto j = i->begin(); j != i->end(); j++) {
+                    // draw letter padded by a single space on each side
+                    // separated by a | character
+                    std::cout << ' ' << *j << ' ' << '|';
+                }
+                std::cout << '\n';
+            }
+        }
+
+        void update_last_player() {
+            switch(last_player) {
+                case player::x:
+                    last_player = player::o;
+                    break;
+                default:
+                    last_player = player::x;
+            }
         }
     };
 }

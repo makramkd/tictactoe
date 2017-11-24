@@ -19,6 +19,11 @@
 */
 namespace tictac {
     using move_t = std::tuple<char, int, int>;
+
+    enum move_status {
+        valid,
+        invalid
+    };
 }
 
 #endif /* move_h */

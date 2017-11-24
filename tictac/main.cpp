@@ -24,6 +24,6 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
     
-    auto game = tictac::game_t(letter == "x" ? 'o' : 'x');
+    auto game = tictac::game_t(letter == "x" ? 'o' : 'x', algorithm);
     game.play();
 }
